@@ -32,7 +32,6 @@ class _AuthScreenState extends State<AuthScreen> {
                   width: 1,
                 ),
               )),
-          SizedBox(height: MediaQuery.of(context).size.height / 4.5),
           Expanded(
               child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -41,6 +40,7 @@ class _AuthScreenState extends State<AuthScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                SizedBox(height: MediaQuery.of(context).size.height / 4.5),
                 Text("Your email",
                     style: TextStyle(
                         fontSize: 20,
