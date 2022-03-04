@@ -30,7 +30,7 @@ $ flutter run lib/main.dart
 > For start confirm flutter instalation on your machine.
 ``` Bash
 $ git clone https://github.com/denver-code/inspishare
-$ cd mobile_metaexchance
+$ cd inspishare
 $ flutter analyze
 $ flutter test
 $ flutter pub get
