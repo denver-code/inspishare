@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.inspishare">
+    package="com.savenko.inspishare">
    <application
         android:label="InspiShare"
         android:name="${applicationName}"
