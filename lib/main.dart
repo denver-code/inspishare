@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inspishare/screens/auth.dart';
 import 'package:inspishare/screens/entercode.dart';
+import 'package:inspishare/screens/mainscreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +19,11 @@ class MyApp extends StatelessWidget {
           // primarySwatch: Colors.black,
           ),
       home: const AuthScreen(),
-      routes: {"/enterCode": (_) => const CodeScreen()},
+      routes: {
+        "/auth": (_) => const AuthScreen(),
+        "/enterCode": (_) => const CodeScreen(),
+        "/home": (_) => const MainScreen()
+      },
     );
   }
 }
