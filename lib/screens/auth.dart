@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inspishare/internal/hexToColor.dart';
+import 'package:inspishare/internal/httpApi.dart';
 import 'package:inspishare/templates/TextFieldModern.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -12,6 +13,9 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final TextEditingController _email = TextEditingController();
   bool _visible = false;
+  // ignore: non_constant_identifier_names
+  String _email_text = "";
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +27,7 @@ class _AuthScreenState extends State<AuthScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-              height: 62,
+              height: MediaQuery.of(context).size.height / 14,
               alignment: Alignment.center,
               child: const Text("Authorize", style: TextStyle(fontSize: 15)),
               decoration: BoxDecoration(
@@ -35,7 +39,8 @@ class _AuthScreenState extends State<AuthScreen> {
               )),
           Expanded(
               child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width / 17.5),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -47,27 +52,17 @@ class _AuthScreenState extends State<AuthScreen> {
                         fontSize: 20,
                         fontWeight: FontWeight.w700,
                         color: HexColor.fromHex("#343237"))),
-                const SizedBox(
-                  height: 15,
+                SizedBox(
+                  height: MediaQuery.of(context).size.height / 60,
                 ),
                 Text("Enter the email address to get the login code",
                     style: TextStyle(color: HexColor.fromHex("#7F7F7F"))),
-                const SizedBox(
-                  height: 15,
+                SizedBox(
+                  height: MediaQuery.of(context).size.height / 60,
                 ),
-                // TextFieldModern(
-                //     controller: _email,
-                //     confirmPass: TextEditingController(),
-                //     obscureText: false,
-                //     isConfirm: false,
-                //     labelText: "Tell us your email",
-                //     helperText: "",
-                //     hintText: "you@example.com",
-                //     isPassword: false),
-
                 Container(
-                  width: 327,
-                  height: 56,
+                  width: MediaQuery.of(context).size.width / 1.5,
+                  height: MediaQuery.of(context).size.height / 15.5,
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(9),
@@ -84,15 +79,16 @@ class _AuthScreenState extends State<AuthScreen> {
                     color: Color.fromRGBO(255, 255, 255, 1),
                   ),
                   child: TextFormField(
+                      controller: _email,
                       onChanged: (text) {
-                        if (text.length > 0) {
+                        _email_text = text;
+                        if (text.isNotEmpty) {
                           _visible = true;
                         } else {
                           _visible = false;
                         }
-                        print('$text');
                       },
-                      inputFormatters: [],
+                      inputFormatters: const [],
                       style: TextStyle(color: HexColor.fromHex("#343237")),
                       decoration: InputDecoration(
                         floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -130,30 +126,62 @@ class _AuthScreenState extends State<AuthScreen> {
                         hintText: "you@example.com",
                       )),
                 ),
-
-                const SizedBox(
-                  height: 15,
+                SizedBox(
+                  height: MediaQuery.of(context).size.height / 60,
                 ),
                 Text(
                     "By using the InspiShare application, you acknowledge and agree with our Privacy Policy",
                     style: TextStyle(
                         color: HexColor.fromHex("#7F7F7F"), fontSize: 13)),
-                const SizedBox(
-                  height: 120,
-                )
+                // const SizedBox(
+                //   height: 120,
+                // )
               ],
             ),
           )),
           Visibility(
-            visible: _visible,
-            child: Container(
-              height: 55,
-              color: HexColor.fromHex("#008CFF"),
-              alignment: Alignment.center,
-              child: const Text("Receive Code",
-                  style: TextStyle(color: Colors.white, fontSize: 13)),
-            ),
-          )
+              visible: _visible,
+              child: GestureDetector(
+                onTap: () {
+                  if (_visible) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                          content: Row(
+                        children: const [
+                          Text("Please wait..."),
+                          SizedBox(
+                            width: 50,
+                          ),
+                          CircularProgressIndicator(),
+                        ],
+                      )),
+                    );
+
+                    Api.post(
+                            {"email": _email_text},
+                            "public/authorization/getCode/",
+                            {"Content-Type": "application/json"})
+                        .then((_repsonse) async {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      if (_repsonse[0] == 200) {
+                        Navigator.of(context).pushNamed("/enterCode");
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("Oops something went wrong...")),
+                        );
+                      }
+                    });
+                  }
+                },
+                child: Container(
+                  height: MediaQuery.of(context).size.height / 16.5,
+                  color: HexColor.fromHex("#008CFF"),
+                  alignment: Alignment.center,
+                  child: const Text("Receive Code",
+                      style: TextStyle(color: Colors.white, fontSize: 13)),
+                ),
+              ))
         ],
       ),
     ));
