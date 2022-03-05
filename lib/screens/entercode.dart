@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:inspishare/internal/hexToColor.dart';
+import 'package:inspishare/internal/shared_storage.dart';
+import 'package:inspishare/internal/verificationCodeInput.dart';
 import 'package:inspishare/templates/TextFieldModern.dart';
+
+import '../internal/httpApi.dart';
 
 class CodeScreen extends StatefulWidget {
   const CodeScreen({Key? key}) : super(key: key);
@@ -13,6 +17,8 @@ class CodeScreen extends StatefulWidget {
 class _AuthScreenState extends State<CodeScreen> {
   final TextEditingController _email = TextEditingController();
   bool _visible = false;
+  bool _onEditing = true;
+  String _code = "";
 
   @override
   Widget build(BuildContext context) {
@@ -59,325 +65,55 @@ class _AuthScreenState extends State<CodeScreen> {
                 const SizedBox(
                   height: 15,
                 ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 45,
-                    ),
-                    Container(
-                      width: 72,
-                      height: 72,
-                      padding: const EdgeInsets.only(top: 10.0),
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(9),
-                          topRight: Radius.circular(9),
-                          bottomLeft: Radius.circular(9),
-                          bottomRight: Radius.circular(9),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                              color:
-                                  Color.fromRGBO(0, 0, 0, 0.05000000074505806),
-                              offset: Offset(0, 4),
-                              blurRadius: 8)
-                        ],
-                        color: Color.fromRGBO(255, 255, 255, 1),
-                      ),
-                      child: TextFormField(
-                          showCursor: true,
-                          cursorColor: HexColor.fromHex("#828282"),
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          maxLength: 1,
-                          autofocus: true,
-                          onChanged: (text) {
-                            if (text.isNotEmpty) {
-                              _visible = true;
-                            } else {
-                              _visible = false;
-                            }
-                          },
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
+                VerificationCode(
+                  keyboardType: TextInputType.number,
+                  length: 4,
+                  autofocus: false,
+                  onCompleted: (String value) async {
+                    print(value);
+                    print(value.length);
+                    if (value.length == 4) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Row(
+                          children: const [
+                            Text("Please wait..."),
+                            SizedBox(
+                              width: 50,
+                            ),
+                            CircularProgressIndicator(),
                           ],
-                          style: TextStyle(
-                              color: HexColor.fromHex("#343237"), fontSize: 35),
-                          decoration: InputDecoration(
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.never,
-                              disabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              border: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              labelStyle: TextStyle(
-                                  color: HexColor.fromHex("#343237"),
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400),
-                              helperStyle: TextStyle(
-                                  color: HexColor.fromHex("#828282"),
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400),
-                              hintStyle: TextStyle(
-                                  color: HexColor.fromHex("#828282"),
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400),
-                              filled: false,
-                              fillColor: Colors.transparent,
-                              // labelText: "0",
-                              hintText: "0",
-                              counterText: "")),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 21,
-                    ),
-                    Container(
-                      width: 72,
-                      height: 72,
-                      padding: const EdgeInsets.only(top: 10.0),
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(9),
-                          topRight: Radius.circular(9),
-                          bottomLeft: Radius.circular(9),
-                          bottomRight: Radius.circular(9),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                              color:
-                                  Color.fromRGBO(0, 0, 0, 0.05000000074505806),
-                              offset: Offset(0, 4),
-                              blurRadius: 8)
-                        ],
-                        color: Color.fromRGBO(255, 255, 255, 1),
-                      ),
-                      child: TextFormField(
-                          showCursor: true,
-                          cursorColor: HexColor.fromHex("#828282"),
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          maxLength: 1,
-                          autofocus: true,
-                          onChanged: (text) {
-                            if (text.isNotEmpty) {
-                              _visible = true;
-                            } else {
-                              _visible = false;
-                            }
+                        )),
+                      );
+                      Api.post(
+                          {
+                            "email":
+                                await StorageApi().getStringValuesSF("email"),
+                            "code": int.parse(value)
                           },
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          style: TextStyle(
-                              color: HexColor.fromHex("#343237"), fontSize: 35),
-                          decoration: InputDecoration(
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.never,
-                              disabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              border: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              labelStyle: TextStyle(
-                                  color: HexColor.fromHex("#343237"),
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400),
-                              helperStyle: TextStyle(
-                                  color: HexColor.fromHex("#828282"),
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400),
-                              hintStyle: TextStyle(
-                                  color: HexColor.fromHex("#828282"),
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400),
-                              filled: false,
-                              fillColor: Colors.transparent,
-                              // labelText: "0",
-                              hintText: "0",
-                              counterText: "")),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 21,
-                    ),
-                    Container(
-                      width: 72,
-                      height: 72,
-                      padding: const EdgeInsets.only(top: 10.0),
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(9),
-                          topRight: Radius.circular(9),
-                          bottomLeft: Radius.circular(9),
-                          bottomRight: Radius.circular(9),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                              color:
-                                  Color.fromRGBO(0, 0, 0, 0.05000000074505806),
-                              offset: Offset(0, 4),
-                              blurRadius: 8)
-                        ],
-                        color: Color.fromRGBO(255, 255, 255, 1),
-                      ),
-                      child: TextFormField(
-                          showCursor: true,
-                          cursorColor: HexColor.fromHex("#828282"),
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          maxLength: 1,
-                          autofocus: true,
-                          onChanged: (text) {
-                            if (text.isNotEmpty) {
-                              _visible = true;
-                            } else {
-                              _visible = false;
-                            }
-                          },
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          style: TextStyle(
-                              color: HexColor.fromHex("#343237"), fontSize: 35),
-                          decoration: InputDecoration(
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.never,
-                              disabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              border: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              labelStyle: TextStyle(
-                                  color: HexColor.fromHex("#343237"),
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400),
-                              helperStyle: TextStyle(
-                                  color: HexColor.fromHex("#828282"),
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400),
-                              hintStyle: TextStyle(
-                                  color: HexColor.fromHex("#828282"),
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400),
-                              filled: false,
-                              fillColor: Colors.transparent,
-                              // labelText: "0",
-                              hintText: "0",
-                              counterText: "")),
-                    ),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 21,
-                    ),
-                    Container(
-                      width: 72,
-                      height: 72,
-                      padding: const EdgeInsets.only(top: 10.0),
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(9),
-                          topRight: Radius.circular(9),
-                          bottomLeft: Radius.circular(9),
-                          bottomRight: Radius.circular(9),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                              color:
-                                  Color.fromRGBO(0, 0, 0, 0.05000000074505806),
-                              offset: Offset(0, 4),
-                              blurRadius: 8)
-                        ],
-                        color: Color.fromRGBO(255, 255, 255, 1),
-                      ),
-                      child: TextFormField(
-                          showCursor: true,
-                          cursorColor: HexColor.fromHex("#828282"),
-                          textAlign: TextAlign.center,
-                          keyboardType: TextInputType.number,
-                          maxLength: 1,
-                          autofocus: true,
-                          onChanged: (text) {
-                            if (text.isNotEmpty) {
-                              _visible = true;
-                            } else {
-                              _visible = false;
-                            }
-                          },
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          style: TextStyle(
-                              color: HexColor.fromHex("#343237"), fontSize: 35),
-                          decoration: InputDecoration(
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.never,
-                              disabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              enabledBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              border: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              focusedBorder: const OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                color: Colors.transparent,
-                              )),
-                              labelStyle: TextStyle(
-                                  color: HexColor.fromHex("#343237"),
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400),
-                              helperStyle: TextStyle(
-                                  color: HexColor.fromHex("#828282"),
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400),
-                              hintStyle: TextStyle(
-                                  color: HexColor.fromHex("#828282"),
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400),
-                              filled: false,
-                              fillColor: Colors.transparent,
-                              // labelText: "0",
-                              hintText: "0",
-                              counterText: "")),
-                    ),
-                  ],
+                          "public/authorization/getCode/check",
+                          {
+                            "Content-Type": "application/json"
+                          }).then((_repsonse) async {
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        if (_repsonse[0] == 200) {
+                          Navigator.of(context).pushNamed("/home");
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Code not valid...")),
+                          );
+                        }
+                      });
+                    }
+                    setState(() {
+                      _code = value;
+                    });
+                  },
+                  onEditing: (bool value) {
+                    setState(() {
+                      _onEditing = value;
+                    });
+                  },
                 ),
                 SizedBox(
                   height: MediaQuery.of(context).size.width / 21,
