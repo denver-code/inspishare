@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inspishare/internal/hexToColor.dart';
 import 'package:inspishare/internal/httpApi.dart';
+import 'package:inspishare/internal/shared_storage.dart';
 import 'package:inspishare/templates/TextFieldModern.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -164,6 +165,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         .then((_repsonse) async {
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       if (_repsonse[0] == 200) {
+                        StorageApi().addStringToSF("email", _email.text);
                         Navigator.of(context).pushNamed("/enterCode");
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
