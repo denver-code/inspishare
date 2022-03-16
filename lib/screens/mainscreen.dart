@@ -16,7 +16,7 @@ class _MainScreenState extends State<MainScreen> {
           SizedBox(
             height: 45,
           ),
-          Text("SOME TEXT NIGGERS!!!!!!!")
+          Text("SOME TEXT!!!!!!!")
         ],
       ),
     );
